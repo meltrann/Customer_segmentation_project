@@ -1,0 +1,149 @@
+---
+title: "Customer Segmentation Analysis of Retail Customers"
+author: "Melinda Tran"
+date: "2023-11-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Introduction
+
+Customer segmentation is a valuable approach for understanding and connecting with diverse customer groups. This involves categorizing customers into different segments based on shared characteristics such as age, gender, interests, and spending habits. This method enables companies to finely tailor their marketing strategies.
+
+
+In the context of this project, we will explore retail customer data, utilizing the K-means clustering algorithm to determine the most effective method of categorizing customers based on certain criteria or features. The primary objective is to delve into the fundamentals of clustering, an unsupervised machine learning method that autonomously organizes data into clusters of similar items without predefined labels.
+
+
+## 2. About Dataset
+
+This dataset focuses on retail customers, encompassing details such as customer ID, age, gender, income, and spending score. The objective is to gain insights into customer profiles, identify target audiences, and provide actionable information to the marketing team for strategic planning. 
+
+The data can be accessed here: https://www.kaggle.com/datasets/vjchoudhary7/customer-segmentation-tutorial-in-python
+
+
+```{r import}
+#Load in libraries
+library(rio)
+library(tidyverse)
+library(skimr)
+library(tidyquant)
+
+#Import the dataset
+customers_tbl<- rio::import("Mall_Customers.csv")
+
+#View datatypes
+glimpse(customers_tbl)
+```
+
+```{r view}
+head(customers_tbl)
+```
+## 3. Exploratory Data Analysis
+
+```{r summary}
+skim(customers_tbl)
+```
+
+The dataset consists of 200 rows and 4 columns. There are no missing values.
+
+```{r summary age}
+summary(customers_tbl$Age)
+```
+
+```{r density}
+customers_tbl %>%
+select(CustomerID,Gender,Age) %>%
+ggplot(aes(Age, fill = Gender)) +
+geom_density(alpha = 0.5) +
+scale_fill_tq() +
+theme_tq() +
+theme(legend.position = "bottom") +
+    labs(
+        title = "Distribution of Age by Gender",
+        subtitle = "Compare the age distribution between male and female customers"
+    ) 
+```
+
+We looked at how age differ between men and women in the dataset. The age ange from 18 to 70. Here's what we found:
+
+- The most common age range for both male and female retail shoppers is 25-35, providing valuable insights into the core demographic.
+- Among female shoppers, there's another noticeable group around the age of 45.
+- However, males tends to shop less as they approach the maximum age of 70.
+
+```{r summary spending}
+summary(customers_tbl$`Spending Score (1-100)`)
+```
+
+```{r summary annual}
+summary(customers_tbl$`Annual Income (k$)`)
+```
+
+```{r box plot}
+customers_tbl %>%
+    gather(key = "variable", value = "value", `Spending Score (1-100)`, `Annual Income (k$)`) %>%
+    ggplot(aes(x = variable, y = value, fill = variable)) +
+    geom_boxplot() +
+    scale_fill_manual(values = c("#18BC9C", "#CCBE93")) + 
+    labs(fill = "") +
+    theme_tq() +
+    labs(
+    title = "Box Plot of Spending Score and Annual Income",
+    subtitle = "Examining Outliers"
+  )
+```
+The visual shows that the Annual income averages around $60,000 and the Spending score averages around 50.
+```{r historgram}
+customers_tbl %>%
+    gather(key = "variable", value = "value", Age, `Annual Income (k$)`, `Spending Score (1-100)`) %>%
+    ggplot(aes(x = value, fill = variable)) +
+    geom_histogram(binwidth = 5, alpha = 0.7, position = "identity", color = "white") +
+    scale_fill_manual(values = c("Age" = "#2C3E50", "Annual Income (k$)" = "#18BC9C", "Spending Score (1-100)" = "#CCBE93")) +
+    facet_wrap(~ variable, scales = "free") +
+    theme_tq()+
+    labs(
+        fill = "",
+        title = "Distribution of Age, Annual Income, and Spending Score"
+        )
+```
+The visual representations help us understand the customers in terms of age, annual incomes, and spending habits:
+- All 3 distributions seems to be normally distributed, with slight skewness. The Spending Score visual seems to follow this pattern the most closely. 
+- Looking at the Age visual, we notice that the majority of our customers are between 20 and 40 years old. 
+- Examining the Annual Income visual, it appears that a significant number of people earn in the range of 60-70K. 
+
+This kind of information is valuable as it gives us a snapshot of the typical customer profile and helps us understand our customer base better.
+```{r bar char}
+# Determine quantile values for income
+quantiles <- customers_tbl %>%
+    pull(`Annual Income (k$)`) %>%
+    quantile(probs = c(0, 0.25, 0.50, 0.75, 1))
+
+# Create a new column 'income_bin' based on quantiles
+customers_income_groups <- customers_tbl %>%
+    mutate(income_bin = case_when(
+        `Annual Income (k$)` <= quantiles[2] ~ "low",
+        `Annual Income (k$)` <= quantiles[4] ~ "medium",
+        TRUE ~ "high"
+    )) %>%
+    group_by(income_bin) %>%
+    summarize(count = n()) %>%
+    ungroup()
+
+# Create a bar chart
+customers_income_groups %>%
+    ggplot(aes(x = factor(income_bin, levels = c("Low", "medium", "High")), y = count)) +
+    geom_col(position = "dodge", width = 0.7, fill = "#2C3E50") +
+    theme_tq() +
+    labs(
+        x = "Income",
+        title = "Customer Distribution Across Income Categories",
+        subtitle = "Exploring customer counts in low, medium, and high income groups"
+    )
+```
+Based on the visualization, a significant portion of our customers fall within the category of median-income earners. The income classifications are defined as follows:
+
+- Low Income: Annual incomes below $40,000.
+- Medium Income: Annual incomes ranging between $40,000 and $80,000. 
+- High Income: Annual incomes exceeding $80,000 or more."
