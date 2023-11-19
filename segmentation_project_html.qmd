@@ -183,7 +183,7 @@ customers_income_groups %>%
 
 Now, let's explore whether this method can group customers into distinct categories based on their annual income and spending score.
 
-To begin, we need to figure out the optimal number of clusters for our analysis, and we employ a technique known as the elbow method. The Skree plot indicates that dividing our consumer population into five groups would be ideal. This choice is made by identifying the spot on the plot where the decrease in how much the data varies within each group starts to slow down, creating a bend similar to the curve of an elbow.
+To begin, we need to figure out the optimal number of clusters for our analysis, and we employ a technique known as the elbow method. The Scree plot indicates that dividing our consumer population into five groups would be ideal. This choice is made by identifying the spot on the plot where the decrease in how much the data varies within each group starts to slow down, creating a bend similar to the curve of an elbow.
 
 ```{r}
 
@@ -205,7 +205,7 @@ kmeans_fxn_tbl <- tibble(centers = 1:10) %>%
     mutate(k_means = centers %>% map(kmeans_fxn)) %>%
     mutate(glance = k_means %>% map(glance))
 
-# Create a Skree Plot (elbow method) to find the optimal value of K 
+# Create a Scree Plot (elbow method) to find the optimal value of K 
 kmeans_fxn_tbl%>%
     unnest(glance) %>%
     select(centers, tot.withinss) %>%
@@ -216,7 +216,7 @@ kmeans_fxn_tbl%>%
     scale_y_continuous(labels = scales::comma)+
     theme_tq()+
     labs(
-        title = "Skree Plot (Elbow Method)"
+        title = "Scree Plot (Elbow Method)"
     )
 ```
 
