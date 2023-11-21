@@ -448,7 +448,7 @@ $ `Spending Score (1-100)` &lt;int&gt; 39, 81, 6, 77, 40, 76, 6, 94, 3, 72, 14, 
 <section id="k-means-clustering" class="level2">
 <h2 class="anchored" data-anchor-id="k-means-clustering">4. K-Means Clustering</h2>
 <p>Now, let’s explore whether this method can group customers into distinct categories based on their annual income and spending score.</p>
-<p>To begin, we need to figure out the optimal number of clusters for our analysis, and we employ a technique known as the elbow method. The Skree plot indicates that dividing our consumer population into five groups would be ideal. This choice is made by identifying the spot on the plot where the decrease in how much the data varies within each group starts to slow down, creating a bend similar to the curve of an elbow.</p>
+<p>To begin, we need to figure out the optimal number of clusters for our analysis, and we employ a technique known as the elbow method. The Scree plot indicates that dividing our consumer population into five groups would be ideal. This choice is made by identifying the spot on the plot where the decrease in how much the data varies within each group starts to slow down, creating a bend similar to the curve of an elbow.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select relevant columns for clustering</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>customers_seg_tbl <span class="ot">&lt;-</span> customers_tbl <span class="sc">%&gt;%</span></span>
@@ -468,7 +468,7 @@ $ `Spending Score (1-100)` &lt;int&gt; 39, 81, 6, 77, 40, 76, 6, 94, 3, 72, 14, 
 <span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">k_means =</span> centers <span class="sc">%&gt;%</span> <span class="fu">map</span>(kmeans_fxn)) <span class="sc">%&gt;%</span></span>
 <span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">glance =</span> k_means <span class="sc">%&gt;%</span> <span class="fu">map</span>(glance))</span>
 <span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a Skree Plot (elbow method) to find the optimal value of K </span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a Scree Plot (elbow method) to find the optimal value of K </span></span>
 <span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>kmeans_fxn_tbl<span class="sc">%&gt;%</span></span>
 <span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unnest</span>(glance) <span class="sc">%&gt;%</span></span>
 <span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(centers, tot.withinss) <span class="sc">%&gt;%</span></span>
@@ -479,7 +479,7 @@ $ `Spending Score (1-100)` &lt;int&gt; 39, 81, 6, 77, 40, 76, 6, 94, 3, 72, 14, 
 <span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span>comma)<span class="sc">+</span></span>
 <span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_tq</span>()<span class="sc">+</span></span>
 <span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
-<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>        <span class="at">title =</span> <span class="st">"Skree Plot (Elbow Method)"</span></span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>        <span class="at">title =</span> <span class="st">"Scree Plot (Elbow Method)"</span></span>
 <span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="segmentation_project_html_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
